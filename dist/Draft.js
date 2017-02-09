@@ -1812,8 +1812,15 @@ var Draft =
 /* 12 */
 /***/ function(module, exports) {
 
+	/*
+	object-assign
+	(c) Sindre Sorhus
+	@license MIT
+	*/
+
 	'use strict';
 	/* eslint-disable no-unused-vars */
+	var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -1834,7 +1841,7 @@ var Draft =
 			// Detect buggy property enumeration order in older V8 versions.
 
 			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-			var test1 = new String('abc');  // eslint-disable-line
+			var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
 			test1[5] = 'de';
 			if (Object.getOwnPropertyNames(test1)[0] === '5') {
 				return false;
@@ -1863,7 +1870,7 @@ var Draft =
 			}
 
 			return true;
-		} catch (e) {
+		} catch (err) {
 			// We don't expect any of the above to throw, but better to be safe.
 			return false;
 		}
@@ -1883,8 +1890,8 @@ var Draft =
 				}
 			}
 
-			if (Object.getOwnPropertySymbols) {
-				symbols = Object.getOwnPropertySymbols(from);
+			if (getOwnPropertySymbols) {
+				symbols = getOwnPropertySymbols(from);
 				for (var i = 0; i < symbols.length; i++) {
 					if (propIsEnumerable.call(from, symbols[i])) {
 						to[symbols[i]] = from[symbols[i]];
@@ -4736,8 +4743,10 @@ var Draft =
 	  // Provides a safe context
 	  if (!isOldIE && document.implementation && document.implementation.createHTMLDocument) {
 	    doc = document.implementation.createHTMLDocument('foo');
-	    doc.documentElement.innerHTML = html;
-	    root = doc.getElementsByTagName('body')[0];
+	    if (doc.documentElement) {
+	      doc.documentElement.innerHTML = html;
+	      root = doc.getElementsByTagName('body')[0];
+	    }
 	  }
 	  return root;
 	}
@@ -9556,10 +9565,14 @@ var Draft =
 	  div.style.position = 'absolute';
 	  div.textContent = 'M';
 
+	  var documentBody = document.body;
+
+	  !documentBody ?  true ? invariant(false, 'Unexpected empty document.body.') : invariant(false) : void 0;
+
 	  // forced layout here
-	  document.body.appendChild(div);
+	  documentBody.appendChild(div);
 	  var rect = div.getBoundingClientRect();
-	  document.body.removeChild(div);
+	  documentBody.removeChild(div);
 
 	  return rect.height;
 	}
